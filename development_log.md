@@ -220,3 +220,25 @@ Validation:
 
 Next:
 Phase 10
+
+## Phase 10
+
+Status: PASS
+
+Implemented:
+- 独立图片对象与比例保持
+
+Tests:
+- 横图、竖图、方图、高分辨率、小图的 contain 和 crop 共 10 passed。
+
+Problems Found:
+- 无新增阻塞。
+
+Fixes:
+- 无。
+
+Validation:
+- 有效裁剪比例与对象比例一致，不拉伸；支持原图片槽位替换。
+
+Next:
+Phase 11
