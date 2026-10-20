@@ -1,0 +1,12 @@
+.venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+*.egg-info/
+output/
+assets/previews/
+assets/template_profiles/
+assets/templates/*.pptx
+*.textClipping
+/*.pptx
+.DS_Store
