@@ -132,3 +132,25 @@ Validation:
 
 Next:
 Phase 6
+
+## Phase 6
+
+Status: PASS
+
+Implemented:
+- 汇报结构与时长权重规划
+
+Tests:
+- 四类完整结构测试 4 passed；五分钟页数、固定目录顺序和重点权重均验证。
+
+Problems Found:
+- 无新增阻塞。
+
+Fixes:
+- 无。
+
+Validation:
+- 显式页数和时长优先，未给参数的推断记录在 assumptions。
+
+Next:
+Phase 7
