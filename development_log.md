@@ -22,3 +22,25 @@ Validation:
 
 Next:
 Phase 1
+
+## Phase 1
+
+Status: PASS
+
+Implemented:
+- 真实模板结构分析与全页预览
+
+Tests:
+- pytest: 2 passed；真实模板 21 页全部渲染，档案 JSON 和 Markdown 已输出。
+
+Problems Found:
+- 无新增阻塞。
+
+Fixes:
+- 无。
+
+Validation:
+- 模板 SHA256 未改变；字体、颜色、母版、固定元素候选、容量和分类均已提取。
+
+Next:
+Phase 2
