@@ -1,0 +1,152 @@
+[
+  {
+    "id": "complete",
+    "request": {
+      "topic": "季度汇报",
+      "presentation_type": "work_report",
+      "audience": "主管",
+      "duration": 5,
+      "target_slide_count": 8
+    },
+    "strategy": "采用明确参数"
+  },
+  {
+    "id": "no_pages",
+    "request": {
+      "duration": 5
+    },
+    "strategy": "按时长估算 6-10 页"
+  },
+  {
+    "id": "no_time",
+    "request": {
+      "target_slide_count": 8
+    },
+    "strategy": "按事实密度分配讲述时间"
+  },
+  {
+    "id": "defaults",
+    "request": {},
+    "strategy": "按材料分类和事实量规划"
+  },
+  {
+    "id": "fixed",
+    "request": {
+      "required_sections": [
+        "目标",
+        "成果",
+        "计划"
+      ]
+    },
+    "strategy": "目录逐字保留"
+  },
+  {
+    "id": "defense",
+    "request": {
+      "presentation_type": "defense",
+      "required_sections": [
+        "个人情况",
+        "学习情况",
+        "工作经历",
+        "实践成果",
+        "总结"
+      ]
+    },
+    "strategy": "目录顺序不可修改"
+  },
+  {
+    "id": "sparse",
+    "request": {},
+    "strategy": "留出明确待补充项"
+  },
+  {
+    "id": "dense",
+    "request": {},
+    "strategy": "按真实容量拆页"
+  },
+  {
+    "id": "multi_source",
+    "request": {},
+    "strategy": "保留全部来源，先检测冲突"
+  },
+  {
+    "id": "academic",
+    "request": {
+      "presentation_type": "academic_report"
+    },
+    "strategy": "背景方法结果结论"
+  },
+  {
+    "id": "custom",
+    "request": {
+      "presentation_type": "custom"
+    },
+    "strategy": "保留材料标题顺序"
+  },
+  {
+    "id": "focus",
+    "request": {
+      "focus_points": [
+        "阶段成果"
+      ]
+    },
+    "strategy": "提高对应事实权重"
+  },
+  {
+    "id": "must_include",
+    "request": {
+      "must_include": [
+        "87.6%"
+      ]
+    },
+    "strategy": "检查必须出现的信息"
+  },
+  {
+    "id": "flexible",
+    "request": {
+      "template_mode": "FLEXIBLE_TEMPLATE"
+    },
+    "strategy": "允许风格内新增布局"
+  },
+  {
+    "id": "notes",
+    "request": {
+      "speaker_notes": false
+    },
+    "strategy": "可关闭讲述备注但仍保留事实来源"
+  },
+  {
+    "id": "one_slide",
+    "request": {
+      "target_slide_count": 1
+    },
+    "strategy": "单页不自动追加封面"
+  },
+  {
+    "id": "bad_duration",
+    "request": {
+      "duration": -1
+    },
+    "strategy": "拒绝负时长",
+    "error": true
+  },
+  {
+    "id": "bad_mode",
+    "request": {
+      "template_mode": "random"
+    },
+    "strategy": "拒绝未知模式",
+    "error": true
+  },
+  {
+    "id": "duplicate_sections",
+    "request": {
+      "required_sections": [
+        "目标",
+        "目标"
+      ]
+    },
+    "strategy": "拒绝重复目录",
+    "error": true
+  }
+]

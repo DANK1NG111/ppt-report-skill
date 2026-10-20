@@ -44,3 +44,25 @@ Validation:
 
 Next:
 Phase 2
+
+## Phase 2
+
+Status: PASS
+
+Implemented:
+- 请求协议和 Skill 行为规范
+
+Tests:
+- pytest: 21 passed；19 个请求模拟覆盖缺页数、缺时长、固定目录、答辩、材料过少过多和多来源。
+
+Problems Found:
+- 首次预览中文出现方框，已先修复渲染环境。
+
+Fixes:
+- 渲染子进程加载 macOS 字体目录并配置中文 fallback；不改 PPTX 字体声明。
+
+Validation:
+- 全页已重渲染；请求强约束与异常策略明确。
+
+Next:
+Phase 3
