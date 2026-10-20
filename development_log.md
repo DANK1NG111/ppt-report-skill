@@ -264,3 +264,25 @@ Validation:
 
 Next:
 Phase 12
+
+## Phase 12
+
+Status: PASS
+
+Implemented:
+- 四类原生图表与嵌入数据工作簿
+
+Tests:
+- column、bar、line、pie 共 4 passed；系列名称、数值、单位、时间与 XLSX 嵌入检查通过。
+
+Problems Found:
+- 无新增阻塞。
+
+Fixes:
+- 无。
+
+Validation:
+- 图表数据可修改，饼图类别和系列数量受约束。
+
+Next:
+Phase 13
