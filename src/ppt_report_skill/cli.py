@@ -9,7 +9,22 @@ def main(argv=None):
     parser.add_argument("command", choices=["analyze", "create", "validate", "render", "regression", "smoke"])
     parser.add_argument("--output", default="output/smoke.pptx")
     parser.add_argument("--template", default="assets/templates/base_template.pptx")
+    parser.add_argument("--materials", nargs="*", default=[])
+    parser.add_argument("--request", help="PresentationRequest JSON 文件")
+    parser.add_argument("--text", help="直接提供的汇报材料")
     args = parser.parse_args(argv)
+    if args.command == "create":
+        import json
+        from .draft import create_draft
+        from .models import ReportError
+        try:
+            data=json.loads(Path(args.request).read_text()) if args.request else {}
+            path=create_draft(args.template,args.materials,data,args.output,args.text)
+        except ReportError as exc:
+            print(str(exc))
+            return 2
+        print(f"DRAFT_UNVALIDATED: {path}")
+        return 0
     if args.command == "analyze":
         from .template.analyzer import analyze_template
         from .renderer.render import render_presentation

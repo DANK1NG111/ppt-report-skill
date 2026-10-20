@@ -60,7 +60,10 @@ def plan_slides(request,facts,outline,profile=None,max_chars=280):
             slots=4
             if profile:
                 candidates=[l for l in profile.layouts if l.layout_type=='contents']
-                if candidates:slots=max(1,len([b for b in candidates[0].body_boxes if len(b['text'])>1])+1)
+                if candidates:
+                    candidate=candidates[0]
+                    boxes=([candidate.title_box] if candidate.title_box else [])+candidate.body_boxes
+                    slots=max(1,len([b for b in boxes if len(b['text'].strip())>1 and not re.search(r'contents|目录',b['text'],re.I)]))
             needed=(len(outline.sections)+slots-1)//slots
             if needed<=remaining:
                 for start in range(0,len(outline.sections),slots):

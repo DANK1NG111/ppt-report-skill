@@ -4,7 +4,7 @@ import re
 from collections import defaultdict
 from ppt_report_skill.models import SourceFact, ReportError
 
-NUMBER = re.compile(r'(?<![\w.])[-+]?\d[\d,]*(?:\.\d+)?\s*(?:%|％|万元|亿元|元|个|人|项|次|台|套|公里|km|kg|秒|分钟|小时|天|万|亿)?')
+NUMBER = re.compile(r'(?<![A-Za-z0-9_.])[-+]?\d[\d,]*(?:\.\d+)?\s*(?:%|％|万元|亿元|元|个|人|项|次|台|套|公里|km|kg|秒|分钟|小时|天|万|亿)?')
 DATE = re.compile(r'\d{4}(?:[-/]\d{1,2}(?:[-/]\d{1,2})?|年(?:\d{1,2}月(?:\d{1,2}日)?)?)')
 CATEGORIES=[('risk','风险|延期|依赖|不确定'),('problem','问题|不足|缺陷|困难'),('plan','下一步|计划|拟于|将于|后续'),('goal','目标|旨在|预期'),('result','成果|实现|完成|获奖|提升|降低'),('progress','进度|进展|已接入|已交付'),('method','方法|采用|算法|实验设计'),('conclusion','结论|总结|表明'),('experience','经历|负责|参与'),('evidence','证据|证明|附件'),('background','背景|现状|需求')]
 
@@ -38,7 +38,7 @@ def detect_conflicts(facts):
         groups[(signature,tuple(dates))].append(fact)
     conflicts=[]
     for (signature,dates),group in groups.items():
-        if len({x.source for x in group})>1 and len({tuple(x.value) for x in group})>1:
+        if len({tuple(x.value) for x in group})>1:
             for fact in group:fact.status='CONFLICT'
             conflicts.append({'status':'CONFLICT','metric':signature,'dates':list(dates),'facts':[f.id for f in group], 'variants':[{'content':f.content,'source':f.source,'location':f.location} for f in group]})
     return conflicts

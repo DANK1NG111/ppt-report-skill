@@ -24,7 +24,12 @@ def write_text(shape,text,*,font_size=None,minimum_size=16,allow_small_shrink=Tr
     frame.clear();frame.word_wrap=True;frame.auto_size=MSO_AUTO_SIZE.NONE
     for i,line in enumerate(text.split('\n')):
         p=frame.paragraphs[0] if i==0 else frame.add_paragraph()
-        if ppr is not None:p._p.insert(0,deepcopy(ppr))
+        if ppr is not None:
+            # TextFrame.clear() keeps the first paragraph's pPr. Replacing it is
+            # essential: a duplicate pPr violates DrawingML and triggers repair.
+            for existing in list(p._p):
+                if existing.tag.endswith('}pPr'):p._p.remove(existing)
+            p._p.insert(0,deepcopy(ppr))
         p.space_after=Pt(4)
         r=p.add_run()
         if rpr is not None:r._r.insert(0,deepcopy(rpr))
