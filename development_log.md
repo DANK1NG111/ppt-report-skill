@@ -66,3 +66,25 @@ Validation:
 
 Next:
 Phase 3
+
+## Phase 3
+
+Status: PASS
+
+Implemented:
+- 多格式材料读取和来源位置保留
+
+Tests:
+- pytest: 29 passed；txt md docx pdf pptx xlsx 和直接文本均验证数字日期保留；docx 段落表格顺序测试通过。
+
+Problems Found:
+- 无新增阻塞。
+
+Fixes:
+- 无。
+
+Validation:
+- 六种格式 fixture 均已创建，空材料和不可提取 PDF 不会伪装成功。
+
+Next:
+Phase 4
