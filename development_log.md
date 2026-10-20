@@ -88,3 +88,25 @@ Validation:
 
 Next:
 Phase 4
+
+## Phase 4
+
+Status: PASS
+
+Implemented:
+- 保真事实提取与跨材料数值冲突检测
+
+Tests:
+- pytest: 32 passed；35 条已知事实逐字、数值、日期、单位、实体和来源校验通过；冲突与不同时间范围测试通过。
+
+Problems Found:
+- 无新增阻塞。
+
+Fixes:
+- 无。
+
+Validation:
+- 提取保持原句，不生成不存在的事实；冲突事实标记 CONFLICT。
+
+Next:
+Phase 5
