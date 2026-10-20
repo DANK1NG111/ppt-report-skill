@@ -154,3 +154,25 @@ Validation:
 
 Next:
 Phase 7
+
+## Phase 7
+
+Status: PASS
+
+Implemented:
+- 逐页证据分配与容量拆页
+
+Tests:
+- Slide Planner 5 passed；三套完整计划、原始证据覆盖、去重、固定目录和总讲述时间通过。
+
+Problems Found:
+- 无新增阻塞。
+
+Fixes:
+- 无。
+
+Validation:
+- 严格页数不足明确报错；长材料保真拆分，不截断数字。
+
+Next:
+Phase 8
