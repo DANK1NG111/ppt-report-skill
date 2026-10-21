@@ -15,6 +15,11 @@ def main(argv=None):
     parser.add_argument("--input", default="output/presentation.pptx", help="需要校验或渲染的 PPTX")
     parser.add_argument("--build", help="包含 slide_plans.json、request.json 和 template_profile.json 的目录")
     args = parser.parse_args(argv)
+    if args.command == "render":
+        from .renderer.render import render_presentation
+        result=render_presentation(args.input,args.output if args.output!='output/smoke.pptx' else 'output/rendered')
+        print(f"PASS: {result['page_count']} rendered; {result['contact_sheet']}")
+        return 0
     if args.command == "validate":
         import json
         from .models import SlidePlan,PresentationRequest,TemplateProfile

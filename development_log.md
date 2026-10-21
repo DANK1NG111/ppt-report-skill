@@ -352,3 +352,25 @@ Validation:
 
 Next:
 Phase 16
+
+## Phase 16
+
+Status: PASS
+
+Implemented:
+- 真实 Office 渲染和完整页数回执
+
+Tests:
+- 真实 Office 三页中文渲染及缓存测试通过；真实模板生成的八页全部重新渲染。
+
+Problems Found:
+- 旧 PDF 残留可能掩盖转换失败。
+
+Fixes:
+- 独立临时目录转换，只有新 PDF 存在才写入输出；清除旧页图；缓存包含中文配置版本。
+
+Validation:
+- 每页 PNG、PDF、contact sheet、提取文字和字体替代均进入回执，页数严格核对。
+
+Next:
+Phase 17
