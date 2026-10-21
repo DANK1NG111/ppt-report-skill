@@ -374,3 +374,25 @@ Validation:
 
 Next:
 Phase 17
+
+## Phase 17
+
+Status: PASS
+
+Implemented:
+- 几何与实际渲染联合视觉 QA
+
+Tests:
+- 重叠、变形、空白、陈旧渲染故障注入通过；真实八页视觉 errors=0，五个稀疏页 Warning 与短测试材料一致。
+
+Problems Found:
+- 结束页名义文本框相交，但实际字形并未相交。
+
+Fixes:
+- 结合 PDF 字形包围框辨别真正文字遮挡，保留无法判断时的 Error。
+
+Validation:
+- 检查文本重叠、比例、对比、密度、标题位置、表格图表可读性和渲染文字覆盖；人工逐页查看仍为交付门槛。
+
+Next:
+Phase 18
