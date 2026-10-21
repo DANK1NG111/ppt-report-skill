@@ -72,7 +72,7 @@ def populate(slide,plan,layout,profile,request):
         # Remove unused numbered markers and keep the template's contents artwork.
         numbers=[b for b in bodies if b['text'].strip().isdigit()]
         for i,b in enumerate(sorted(numbers,key=lambda b:b['y'])):
-            if i>=len(texts):shapes[b['shape_id']].text_frame.clear()
+            if i>=len(texts):remove_shape(shapes[b['shape_id']])
             else:write_text(shapes[b['shape_id']],str(plan.payload.get('start_index',1)+i),font_size=b['font_size'])
         return receipts
     if title:

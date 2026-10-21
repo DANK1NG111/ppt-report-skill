@@ -28,6 +28,10 @@ def contrast(a,b):
 
 
 def background_sample(image,shape,width,height):
+    # Native filled number markers have their own background inside the frame.
+    try:
+        if shape.fill.type==1 and shape.fill.fore_color.type==MSO_COLOR_TYPE.RGB:return tuple(shape.fill.fore_color.rgb)
+    except (AttributeError,TypeError):pass
     x0=int(shape.left/width*image.width);y0=int(shape.top/height*image.height)
     x1=int((shape.left+shape.width)/width*image.width);y1=int((shape.top+shape.height)/height*image.height)
     points=[(x,y0+1) for x in range(max(0,x0),min(image.width,x1),max(1,(x1-x0)//12))]

@@ -66,8 +66,9 @@ def plan_slides(request,facts,outline,profile=None,max_chars=280):
                     slots=max(1,len([b for b in boxes if len(b['text'].strip())>1 and not re.search(r'contents|目录',b['text'],re.I)]))
             needed=(len(outline.sections)+slots-1)//slots
             if needed<=remaining:
-                for start in range(0,len(outline.sections),slots):
-                    toc.append(SlidePlan(0,'目录','contents','目录','汇报目录',[],[],layout_requirement='contents',payload={'text_items':outline.sections[start:start+slots],'start_index':start+1}))
+                balanced=(len(outline.sections)+needed-1)//needed
+                for start in range(0,len(outline.sections),balanced):
+                    toc.append(SlidePlan(0,'目录','contents','目录','汇报目录',[],[],layout_requirement='contents',payload={'text_items':outline.sections[start:start+balanced],'start_index':start+1}))
                 remaining-=needed
         while remaining:
             splittable=next((p for p in pages if p.slide_type=='content' and len(p.payload.get('text_items',[]))>1),None)

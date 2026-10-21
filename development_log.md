@@ -462,3 +462,25 @@ Validation:
 
 Next:
 Phase 21
+
+## Phase 21
+
+Status: PASS
+
+Implemented:
+- 同一真实模板三类完整汇报测试
+
+Tests:
+- 工作8页、项目13页、答辩10页全部生成并渲染；全部来源事实、独立预期数字与固定目录顺序检查通过，errors=0。
+
+Problems Found:
+- 目录续页留下空白圆形标记；对比度检查把原生填色标记的外部白底误当背景。
+
+Fixes:
+- 目录分栏均衡并删除未用条目标记；原生填色对象优先使用真实填色计算对比度。
+
+Validation:
+- 三类材料共31页，保留单页图片、PDF、来源、规划、QA和生成回执。
+
+Next:
+Phase 22
