@@ -330,3 +330,25 @@ Validation:
 
 Next:
 Phase 15
+
+## Phase 15
+
+Status: PASS
+
+Implemented:
+- 结构内容几何与可编辑性 QA
+
+Tests:
+- 4 项故障注入和正常文件检查通过；真实 8 页文件 errors=0，2 项模板原始裁切 Warning 已确认来自原图。
+
+Problems Found:
+- 模板封面背景与章节装饰本身越界，章节线条高度为零。
+
+Fixes:
+- 零高直线合法；只有坐标和类型与源模板完全相同时记录 TEMPLATE_CROP Warning，新增越界仍为 Error。
+
+Validation:
+- 输出 qa_report.json/md；检查关系、XML 单例、残留、来源覆盖、页数、章节、原生表格图表和嵌入工作簿。
+
+Next:
+Phase 16

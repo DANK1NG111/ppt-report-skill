@@ -12,7 +12,22 @@ def main(argv=None):
     parser.add_argument("--materials", nargs="*", default=[])
     parser.add_argument("--request", help="PresentationRequest JSON 文件")
     parser.add_argument("--text", help="直接提供的汇报材料")
+    parser.add_argument("--input", default="output/presentation.pptx", help="需要校验或渲染的 PPTX")
+    parser.add_argument("--build", help="包含 slide_plans.json、request.json 和 template_profile.json 的目录")
     args = parser.parse_args(argv)
+    if args.command == "validate":
+        import json
+        from .models import SlidePlan,PresentationRequest,TemplateProfile
+        from .validator import validate_presentation
+        plans=request=profile=None
+        if args.build:
+            build=Path(args.build)
+            plans=[SlidePlan(**x) for x in json.loads((build/'slide_plans.json').read_text())]
+            request=PresentationRequest(**json.loads((build/'request.json').read_text())) if (build/'request.json').exists() else None
+            profile=TemplateProfile.from_dict(json.loads((build/'template_profile.json').read_text())) if (build/'template_profile.json').exists() else None
+        result=validate_presentation(args.input,args.output if args.output!='output/smoke.pptx' else 'output',plans,request,profile)
+        print(f"{result['status']}: errors={result['errors']}, warnings={result['warnings']}")
+        return int(bool(result['errors']))
     if args.command == "create":
         import json
         from .draft import create_draft
