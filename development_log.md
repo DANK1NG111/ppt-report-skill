@@ -396,3 +396,25 @@ Validation:
 
 Next:
 Phase 18
+
+## Phase 18
+
+Status: PASS
+
+Implemented:
+- 有界自动修复与重渲染验证循环
+
+Tests:
+- 故意越界、文本框过小、图片拉伸的两页用例，经真实 Office 重渲染后 errors=0；正文和数字逐字回读未改变。
+
+Problems Found:
+- 无新增阻塞。
+
+Fixes:
+- 无。
+
+Validation:
+- 保留原文件，生成独立修复副本和逐轮 QA/渲染/动作回执；无法可靠修复时保留失败状态，不无限重试。
+
+Next:
+Phase 19
