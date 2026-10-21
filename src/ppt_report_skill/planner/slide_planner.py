@@ -67,13 +67,20 @@ def plan_slides(request,facts,outline,profile=None,max_chars=280):
             needed=(len(outline.sections)+slots-1)//slots
             if needed<=remaining:
                 for start in range(0,len(outline.sections),slots):
-                    toc.append(SlidePlan(0,'目录','contents','目录','汇报目录',[],[],layout_requirement='contents',payload={'text_items':outline.sections[start:start+slots]}))
+                    toc.append(SlidePlan(0,'目录','contents','目录','汇报目录',[],[],layout_requirement='contents',payload={'text_items':outline.sections[start:start+slots],'start_index':start+1}))
                 remaining-=needed
         while remaining:
-            # Add genuine section dividers; these carry no invented achievement.
-            section=outline.sections[(remaining-1)%len(outline.sections)]
-            position=next(i for i,p in enumerate(pages) if p.section==section)
-            pages.insert(position,SlidePlan(0,section,'section',section,section,[],[],layout_requirement='section'))
+            splittable=next((p for p in pages if p.slide_type=='content' and len(p.payload.get('text_items',[]))>1),None)
+            if splittable:
+                texts=splittable.payload['text_items'];cut=(len(texts)+1)//2
+                second=SlidePlan(0,splittable.section,'content',splittable.section+'（续）',texts[cut],splittable.supporting_facts[cut:],splittable.source_refs[cut:],importance=splittable.importance,payload={'text_items':texts[cut:]})
+                splittable.payload['text_items']=texts[:cut];splittable.supporting_facts=splittable.supporting_facts[:cut];splittable.source_refs=splittable.source_refs[:cut]
+                pages.insert(pages.index(splittable)+1,second)
+            else:
+                section=outline.sections[(remaining-1)%len(outline.sections)]
+                position=max(i for i,p in enumerate(pages) if p.section==section)+1
+                label=f'[待补充：{section}的补充证据]'
+                pages.insert(position,SlidePlan(0,section,'content',section+'补充',label,[],[],payload={'text_items':[label]}))
             remaining-=1
         pages=[SlidePlan(0,'封面','cover',request.topic,request.topic,[],[],layout_requirement='cover'),*toc,*pages,SlidePlan(0,'结束','closing','感谢聆听','感谢聆听',[],[],layout_requirement='closing')]
     for n,page in enumerate(pages,1):page.slide_number=n

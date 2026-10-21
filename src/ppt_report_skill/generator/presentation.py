@@ -73,6 +73,7 @@ def populate(slide,plan,layout,profile,request):
         numbers=[b for b in bodies if b['text'].strip().isdigit()]
         for i,b in enumerate(sorted(numbers,key=lambda b:b['y'])):
             if i>=len(texts):shapes[b['shape_id']].text_frame.clear()
+            else:write_text(shapes[b['shape_id']],str(plan.payload.get('start_index',1)+i),font_size=b['font_size'])
         return receipts
     if title:
         size=layout.title_box['font_size'];expand_title(title,plan.title,profile,size)

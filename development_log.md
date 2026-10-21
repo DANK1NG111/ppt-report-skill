@@ -440,3 +440,25 @@ Validation:
 
 Next:
 Phase 20
+
+## Phase 20
+
+Status: PASS
+
+Implemented:
+- 三套明确标注的固定回归材料
+
+Tests:
+- 工作、项目进展、固定目录答辩材料与预期值清单已建立；规划和生成相关 6 项测试通过。
+
+Problems Found:
+- 无新增阻塞。
+
+Fixes:
+- 多余页数优先拆分真实证据，避免复制带固定章节编号的装饰；目录续页编号按真实序号写入。
+
+Validation:
+- 测试数字、未完成状态和固定五节顺序均有独立预期清单，后续实际生成逐项验证。
+
+Next:
+Phase 21

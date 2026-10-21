@@ -1,0 +1,13 @@
+{
+  "topic": "TEST FIXTURE 答辩汇报",
+  "presentation_type": "defense",
+  "duration": 5,
+  "target_slide_count": 10,
+  "required_sections": [
+    "01 个人情况",
+    "02 学习情况",
+    "03 工作经历",
+    "04 实践成果",
+    "05 总结"
+  ]
+}

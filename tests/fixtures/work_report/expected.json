@@ -1,0 +1,15 @@
+{
+  "fixture": true,
+  "required_values": [
+    "87.6",
+    "12",
+    "18",
+    "16",
+    "2"
+  ],
+  "required_phrases": [
+    "复核",
+    "测试"
+  ],
+  "required_sections": []
+}
