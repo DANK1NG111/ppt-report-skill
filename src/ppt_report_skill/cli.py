@@ -14,6 +14,7 @@ def main(argv=None):
     parser.add_argument("--text", help="直接提供的汇报材料")
     parser.add_argument("--input", default="output/presentation.pptx", help="需要校验或渲染的 PPTX")
     parser.add_argument("--build", help="包含 slide_plans.json、request.json 和 template_profile.json 的目录")
+    parser.add_argument("--draft", action="store_true", help="仅生成草稿，跳过完整 QA 流程")
     args = parser.parse_args(argv)
     if args.command == "render":
         from .renderer.render import render_presentation
@@ -36,14 +37,15 @@ def main(argv=None):
     if args.command == "create":
         import json
         from .draft import create_draft
+        from .pipeline import create_presentation
         from .models import ReportError
         try:
             data=json.loads(Path(args.request).read_text()) if args.request else {}
-            path=create_draft(args.template,args.materials,data,args.output,args.text)
+            result=create_draft(args.template,args.materials,data,args.output,args.text) if args.draft else create_presentation(args.template,args.materials,data,args.output if args.output!='output/smoke.pptx' else 'output/presentation.pptx',args.text)
         except ReportError as exc:
             print(str(exc))
             return 2
-        print(f"DRAFT_UNVALIDATED: {path}")
+        print(f"DRAFT_UNVALIDATED: {result}" if args.draft else f"{result['status']}: {result['path']}")
         return 0
     if args.command == "analyze":
         from .template.analyzer import analyze_template

@@ -24,4 +24,6 @@ def parse_request(data):
             raise ReportError('INVALID_REQUEST',f'{key} 必须是非空字符串列表。')
     if len(set(request.required_sections)) != len(request.required_sections):
         raise ReportError('INVALID_REQUEST','固定目录不能包含重复章节。')
+    if not isinstance(request.visuals,list) or any(not isinstance(v,dict) or v.get('type') not in {'image','table','chart','diagram'} for v in request.visuals):
+        raise ReportError('INVALID_REQUEST','visuals 必须是 image/table/chart/diagram 对象列表。')
     return request

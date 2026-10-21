@@ -103,6 +103,7 @@ class PresentationRequest:
     must_include: list[str] = field(default_factory=list)
     template_mode: str = "STRICT_TEMPLATE"
     speaker_notes: bool = True
+    visuals: list[dict] = field(default_factory=list)
 
 
 @dataclass

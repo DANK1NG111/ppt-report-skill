@@ -57,9 +57,14 @@ def populate(slide,plan,layout,profile,request):
     title=shapes.get(layout.title_box['shape_id']) if layout.title_box else None
     bodies=[b for b in layout.body_boxes if b['shape_id'] in shapes]
     receipts=[]
+    if title and 'flexible_derived' in layout.secondary_tags:
+        for field,attribute in [('x','left'),('y','top'),('width','width'),('height','height')]:setattr(title,attribute,layout.title_box[field])
     if plan.slide_type=='contents':
         slots=sorted(([layout.title_box] if layout.title_box else [])+bodies,key=lambda b:(b['y'],b['x']))
         slots=[b for b in slots if len(b['text'].strip())>1 and not re.search(r'contents|目录',b['text'],re.I)]
+        if 'flexible_derived' in layout.secondary_tags:
+            slots=[b for b in bodies if b['height']>profile.slide_height*.1]
+            if title:write_text(title,'目录',font_size=layout.title_box['font_size'])
         texts=plan.payload.get('text_items',[])
         if len(texts)>len(slots):raise ReportError('LAYOUT_CAPACITY','目录条目超过真实槽位数量。')
         for i,b in enumerate(slots):
