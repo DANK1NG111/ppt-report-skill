@@ -7,7 +7,7 @@ import json
 from pathlib import Path
 import shutil
 import uuid
-from ppt_report_skill.models import MaterialBlock,SourceFact,SlidePlan,ReportError,save_json
+from ppt_report_skill.models import MaterialBlock,SourceFact,SlidePlan,ReportError,Issue,save_json
 from ppt_report_skill.request import parse_request
 from ppt_report_skill.template.analyzer import analyze_template
 from ppt_report_skill.template.profile import cached_profile
@@ -20,6 +20,8 @@ from ppt_report_skill.generator.presentation import generate_presentation
 from ppt_report_skill.generator.tables import table_pages
 from ppt_report_skill.repair import repair_loop
 from ppt_report_skill.layout.flexible import extend_layouts
+from ppt_report_skill.fonts import font_report
+from ppt_report_skill.validator.presentation import write_report
 
 
 def native_plans(blocks,request,facts,outline,max_rows=6):
@@ -109,10 +111,14 @@ def create_presentation(template,materials,request_data,output,direct_text=None)
                 save_json(attempts,build/'generation_attempts.json');raise
     save_json(outline,build/'outline.json');save_json(attempts,build/'generation_attempts.json')
     repaired=repair_loop(path,build/'repair',plans,request,profile)
-    save_json(repaired['report'],output.parent/'qa_report.json')
-    shutil.copy2(build/'repair'/f"qa-{repaired['history'][-1]['iteration']}"/'qa_report.md',output.parent/'qa_report.md')
+    fonts=font_report(profile);save_json(fonts,build/'font_report.json')
+    if fonts['missing_families']:
+        repaired['report']['warnings']+=1
+        repaired['report']['issues'].append({'code':'FONT_MISSING','severity':'warning','message':'模板部分字体本机未安装；PPTX 声明保留，渲染使用替代字体，详见 font_report.json。','slide':None,'shape_id':None,'repaired':False})
+        if repaired['report']['errors']==0:repaired['report']['status']='PASS_WITH_WARNINGS'
+    write_report([Issue(**i) for i in repaired['report']['issues']],output.parent)
     if not repaired['resolved']:raise ReportError('QA_FAILED',f'自动修复后仍有 {repaired["report"]["errors"]} 项 Error，详见 {build}/repair。')
     output.parent.mkdir(parents=True,exist_ok=True);shutil.copy2(repaired['path'],output)
-    result={'status':'READY_FOR_VISUAL_REVIEW','path':str(output),'sha256':hashlib.sha256(output.read_bytes()).hexdigest(),'build':str(build),'slide_count':len(plans),'qa':repaired['report'],'rendered':repaired['rendered'],'assumptions':outline.assumptions,'presentation_type':outline.presentation_type,'template':str(Path(template).resolve()),'sources':sorted({f.source for f in facts})}
+    result={'status':'READY_FOR_VISUAL_REVIEW','path':str(output),'sha256':hashlib.sha256(output.read_bytes()).hexdigest(),'build':str(build),'slide_count':len(plans),'qa':repaired['report'],'rendered':repaired['rendered'],'assumptions':outline.assumptions,'presentation_type':outline.presentation_type,'template':str(Path(template).resolve()),'sources':sorted({f.source for f in facts}),'fonts':fonts}
     save_json(result,build/'pipeline_receipt.json');save_json(result,output.parent/'pipeline_receipt.json')
     return result

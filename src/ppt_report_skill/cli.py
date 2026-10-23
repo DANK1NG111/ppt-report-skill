@@ -16,6 +16,25 @@ def main(argv=None):
     parser.add_argument("--build", help="包含 slide_plans.json、request.json 和 template_profile.json 的目录")
     parser.add_argument("--draft", action="store_true", help="仅生成草稿，跳过完整 QA 流程")
     args = parser.parse_args(argv)
+    try:
+        return _execute(args)
+    except Exception as exc:
+        import json
+        import traceback
+        from .models import ReportError
+        from datetime import datetime,timezone
+        code,message=(exc.code,exc.message) if isinstance(exc,ReportError) else ('INVALID_REQUEST','请求 JSON 格式无效。') if isinstance(exc,json.JSONDecodeError) else ('PERMISSION_DENIED','文件访问权限不足。') if isinstance(exc,PermissionError) else ('INPUT_NOT_FOUND','输入文件不存在。') if isinstance(exc,FileNotFoundError) else ('INVALID_INPUT','输入格式或对象数据无效。') if isinstance(exc,(ValueError,TypeError,KeyError)) else ('INTERNAL_ERROR','执行失败，请查看技术日志。')
+        directory=Path(args.output).parent if Path(args.output).suffix else Path(args.output)
+        try:
+            directory.mkdir(parents=True,exist_ok=True)
+            with (directory/'error.log').open('a') as log:
+                log.write(f'\n{datetime.now(timezone.utc).isoformat()} {code}\n{getattr(exc,"detail","")}\n{traceback.format_exc()}')
+        except OSError:pass
+        print(f'{code}: {message}')
+        return 2
+
+
+def _execute(args):
     if args.command == "regression":
         from .regression import run_regression
         result=run_regression()
@@ -43,13 +62,8 @@ def main(argv=None):
         import json
         from .draft import create_draft
         from .pipeline import create_presentation
-        from .models import ReportError
-        try:
-            data=json.loads(Path(args.request).read_text()) if args.request else {}
-            result=create_draft(args.template,args.materials,data,args.output,args.text) if args.draft else create_presentation(args.template,args.materials,data,args.output if args.output!='output/smoke.pptx' else 'output/presentation.pptx',args.text)
-        except ReportError as exc:
-            print(str(exc))
-            return 2
+        data=json.loads(Path(args.request).read_text()) if args.request else {}
+        result=create_draft(args.template,args.materials,data,args.output,args.text) if args.draft else create_presentation(args.template,args.materials,data,args.output if args.output!='output/smoke.pptx' else 'output/presentation.pptx',args.text)
         print(f"DRAFT_UNVALIDATED: {result}" if args.draft else f"{result['status']}: {result['path']}")
         return 0
     if args.command == "analyze":
@@ -69,7 +83,7 @@ def main(argv=None):
         assert len(Presentation(path).slides) == 1
         print(path)
         return 0
-    parser.error("此命令将在对应开发阶段实现")
+    raise ValueError('未支持的命令')
 
 
 if __name__ == "__main__":
