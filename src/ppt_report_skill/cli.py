@@ -6,7 +6,7 @@ from pptx import Presentation
 
 def main(argv=None):
     parser = argparse.ArgumentParser(description="基于真实模板制作可编辑汇报 PPT")
-    parser.add_argument("command", choices=["analyze", "create", "validate", "render", "regression", "smoke"])
+    parser.add_argument("command", choices=["analyze", "create", "validate", "render", "regression", "finalize", "smoke"])
     parser.add_argument("--output", default="output/smoke.pptx")
     parser.add_argument("--template", default="assets/templates/base_template.pptx")
     parser.add_argument("--materials", nargs="*", default=[])
@@ -14,6 +14,9 @@ def main(argv=None):
     parser.add_argument("--text", help="直接提供的汇报材料")
     parser.add_argument("--input", default="output/presentation.pptx", help="需要校验或渲染的 PPTX")
     parser.add_argument("--build", help="包含 slide_plans.json、request.json 和 template_profile.json 的目录")
+    parser.add_argument("--receipt", help="Pipeline 回执 JSON")
+    parser.add_argument("--review", help="逐页复核记录 JSON")
+    parser.add_argument("--pdf", action="store_true", help="交付时复制 PDF")
     parser.add_argument("--draft", action="store_true", help="仅生成草稿，跳过完整 QA 流程")
     args = parser.parse_args(argv)
     try:
@@ -35,6 +38,14 @@ def main(argv=None):
 
 
 def _execute(args):
+    if args.command == "finalize":
+        from .delivery import finalize_delivery
+        if not args.receipt or not args.review:
+            from .models import ReportError
+            raise ReportError("INVALID_REQUEST","finalize 需要 --receipt 和 --review。")
+        result=finalize_delivery(args.receipt,args.review,include_pdf=args.pdf)
+        print(f"DELIVERED: {result['path']}")
+        return 0
     if args.command == "regression":
         from .regression import run_regression
         result=run_regression()
@@ -63,7 +74,7 @@ def _execute(args):
         from .draft import create_draft
         from .pipeline import create_presentation
         data=json.loads(Path(args.request).read_text()) if args.request else {}
-        result=create_draft(args.template,args.materials,data,args.output,args.text) if args.draft else create_presentation(args.template,args.materials,data,args.output if args.output!='output/smoke.pptx' else 'output/presentation.pptx',args.text)
+        result=create_draft(args.template,args.materials,data,args.output,args.text) if args.draft else create_presentation(args.template,args.materials,data,args.output if args.output!='output/smoke.pptx' else 'output/final_presentation.pptx',args.text)
         print(f"DRAFT_UNVALIDATED: {result}" if args.draft else f"{result['status']}: {result['path']}")
         return 0
     if args.command == "analyze":

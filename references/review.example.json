@@ -1,0 +1,8 @@
+{
+  "sha256": "填写当前 pipeline_receipt.json 的 sha256",
+  "pages": [{"slide": 1, "status": "PASS", "observation": "填写本页实际查看的文字、图片、排版结果；每页一条"}],
+  "facts_checked": false,
+  "section_order_checked": false,
+  "native_open": {"application": "Microsoft PowerPoint", "repair_prompt": null, "observation": "填写实际打开的结果"},
+  "warning_dispositions": {"CODE:slide:shape_id": "填写该警告的具体处置或接受依据"}
+}
