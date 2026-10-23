@@ -484,3 +484,25 @@ Validation:
 
 Next:
 Phase 22
+
+## Phase 22
+
+Status: PASS
+
+Implemented:
+- 一键全量回归与分类报告
+
+Tests:
+- python scripts/run_regression.py: PASS；130 tests，0 failures/errors/skips；三类真实模板31页再次通过。
+
+Problems Found:
+- 无新增阻塞。
+
+Fixes:
+- 无。
+
+Validation:
+- 材料、模板、事实、规划、布局、生成、校验、渲染全部有实际测试覆盖，保存 JUnit 和完整日志。
+
+Next:
+Phase 23

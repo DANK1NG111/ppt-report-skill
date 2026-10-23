@@ -16,6 +16,11 @@ def main(argv=None):
     parser.add_argument("--build", help="包含 slide_plans.json、request.json 和 template_profile.json 的目录")
     parser.add_argument("--draft", action="store_true", help="仅生成草稿，跳过完整 QA 流程")
     args = parser.parse_args(argv)
+    if args.command == "regression":
+        from .regression import run_regression
+        result=run_regression()
+        print(f"{result['status']}: {result['counts']}; {result['elapsed_seconds']}s")
+        return int(result['status']!='PASS')
     if args.command == "render":
         from .renderer.render import render_presentation
         result=render_presentation(args.input,args.output if args.output!='output/smoke.pptx' else 'output/rendered')
