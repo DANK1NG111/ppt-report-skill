@@ -10,6 +10,7 @@ import uuid
 from ppt_report_skill.models import MaterialBlock,SourceFact,SlidePlan,ReportError,save_json
 from ppt_report_skill.request import parse_request
 from ppt_report_skill.template.analyzer import analyze_template
+from ppt_report_skill.template.profile import cached_profile
 from ppt_report_skill.content.loader import load_materials
 from ppt_report_skill.content.facts import extract_facts,detect_conflicts
 from ppt_report_skill.planner.outline import plan_outline,assign_facts
@@ -82,7 +83,8 @@ def combine_plans(request,facts,outline,profile,blocks,max_chars,max_rows):
 def create_presentation(template,materials,request_data,output,direct_text=None):
     output=Path(output).resolve();run_id=datetime.now(timezone.utc).strftime('%Y%m%dT%H%M%S')+'-'+uuid.uuid4().hex[:8]
     build=output.parent/'build'/run_id;build.mkdir(parents=True,exist_ok=True)
-    request=parse_request(request_data);profile=analyze_template(template,build/'template_profile.json')
+    request=parse_request(request_data);profile,cache=cached_profile(template,output.parent/'template_cache',build/'template_profile.json')
+    save_json(cache,build/'template_cache_receipt.json')
     profile=extend_layouts(profile,request.template_mode)
     save_json(profile,build/'template_profile.json')
     blocks=load_materials(materials,direct_text,build/'material_images')

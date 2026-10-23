@@ -506,3 +506,25 @@ Validation:
 
 Next:
 Phase 23
+
+## Phase 23
+
+Status: PASS
+
+Implemented:
+- 按内容与分析器版本缓存模板档案
+
+Tests:
+- 缓存命中、模板变化、缓存损坏与真实渲染缓存测试通过；真实30.8MB模板首次0.1541s，命中0.0127s。
+
+Problems Found:
+- 无新增阻塞。
+
+Fixes:
+- 无。
+
+Validation:
+- 模板未改变不重复完整解析；渲染缓存核对 PDF、图片和 contact sheet 内容哈希，避免损坏旧产物误用。
+
+Next:
+Phase 24

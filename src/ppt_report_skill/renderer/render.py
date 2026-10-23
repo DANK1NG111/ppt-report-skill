@@ -27,8 +27,11 @@ def render_presentation(path, output, *, dpi=110):
     if not 60<=dpi<=300:raise ReportError('INVALID_REQUEST','渲染 DPI 应为 60–300。')
     receipt = output / "render_receipt.json"
     if receipt.exists():
-        cached = json.loads(receipt.read_text())
-        if cached.get("sha256") == digest and cached.get("dpi") == dpi and cached.get("font_config_version") == 2 and all(Path(p).exists() for p in cached["images"]) and Path(cached["pdf"]).exists():
+        try:cached = json.loads(receipt.read_text())
+        except ValueError:cached={}
+        artifacts=cached.get('artifact_hashes',{})
+        valid=bool(artifacts) and all(Path(p).is_file() and hashlib.sha256(Path(p).read_bytes()).hexdigest()==sha for p,sha in artifacts.items())
+        if cached.get("sha256") == digest and cached.get("dpi") == dpi and cached.get("font_config_version") == 2 and cached.get('engine')==engine and valid:
             return cached
     # Unique office profile makes simultaneous conversions independent.
     with tempfile.TemporaryDirectory(prefix="ppt-report-render-") as work:
@@ -69,5 +72,6 @@ def render_presentation(path, output, *, dpi=110):
         if str(stale) not in images:stale.unlink()
     sheet = contact_sheet(images, output / "contact_sheet.png")
     result = dict(sha256=digest, dpi=dpi, engine=engine, pdf=str(pdf), images=images, contact_sheet=str(sheet), page_count=len(images), font_config_version=2, font_substitutions=substitutions, page_texts=texts)
+    result['artifact_hashes']={str(p):hashlib.sha256(Path(p).read_bytes()).hexdigest() for p in [pdf,sheet,*images]}
     save_json(result, receipt)
     return result
