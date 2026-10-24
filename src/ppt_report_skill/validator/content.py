@@ -29,7 +29,9 @@ def content_issues(prs,plans=None,request=None):
             if shape.has_text_frame and shape.top>prs.slide_height*.9 and shape.text.strip().isdigit() and int(shape.text.strip())!=i:
                 issues.append(Issue('PAGE_NUMBER','warning','底部数字与当前页号不同，需核对是否为页码。',i,shape.shape_id))
         if not text.strip():issues.append(Issue('BLANK_SLIDE','error','页面无可编辑文字。',i))
-        if SAMPLE.search(text):issues.append(Issue('TEMPLATE_SAMPLE','error','残留模板示例文字或数字。',i))
+        matches=list(SAMPLE.finditer(text))
+        authorized='\n'.join([str(r.get('original_text','')) for p in (plans or []) for r in p.source_refs]+[p.title for p in (plans or [])])
+        if any(m.group() not in authorized for m in matches):issues.append(Issue('TEMPLATE_SAMPLE','error','残留模板示例文字或数字。',i))
         if '[待补充' in text:issues.append(Issue('MISSING_CONTENT','warning','存在明确待补充项。',i))
         if plans and i<=len(plans):
             plan=plans[i-1]
@@ -46,6 +48,8 @@ def content_issues(prs,plans=None,request=None):
         for required in request.must_include:
             if compact(required) not in compact(all_text):issues.append(Issue('REQUIRED_CONTENT_MISSING','error','缺少必选信息：'+required))
         if plans:
-            actual=list(dict.fromkeys(p.section for p in plans if p.slide_type in {'content','section'}))
+            actual=[]
+            for p in plans:
+                if p.slide_type in {'content','section'} and (not actual or actual[-1]!=p.section):actual.append(p.section)
             if request.required_sections and actual!=request.required_sections:issues.append(Issue('SECTION_ORDER','error','章节顺序与固定目录不一致。'))
     return issues

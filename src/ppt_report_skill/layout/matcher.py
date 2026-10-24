@@ -1,6 +1,6 @@
 from ppt_report_skill.models import ReportError
 
-COMPATIBLE={'comparison':['comparison','two_column'],'summary':['summary','title_content'],'image_text':['image_text','image_full'],'data':['data','chart','table'],'chart':['chart','data','title_content'],'table':['table','data','title_content'],'process':['process','timeline','title_content']}
+COMPATIBLE={'image_full':['title_content'],'comparison':['comparison','two_column'],'summary':['summary','title_content'],'image_text':['image_text','image_full'],'data':['data','chart','table'],'chart':['chart','data','title_content'],'table':['table','data','title_content'],'process':['process','timeline','title_content']}
 
 
 def score_layout(plan,layout):

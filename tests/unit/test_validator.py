@@ -36,3 +36,15 @@ def test_inherited_crop_is_reviewed_not_silently_ignored(tmp_path):
     out=generate_presentation(p.template_path,p,plans,PresentationRequest(),tmp_path/'crop.pptx')
     r=validate_presentation(out,plans=plans,profile=p)
     assert r['errors']==0 and any(i['code']=='TEMPLATE_CROP' for i in r['issues'])
+
+
+def test_section_return_is_an_error_and_sourced_sample_number_is_allowed():
+    from ppt_report_skill.validator.content import content_issues
+    from ppt_report_skill.models import SlidePlan,PresentationRequest
+    p=Presentation();plans=[]
+    for i,section in enumerate(['数据','风险','数据'],1):
+        slide=p.slides.add_slide(p.slide_layouts[6]);slide.shapes.add_textbox(Inches(1),Inches(1),Inches(6),Inches(2)).text='99+项'
+        plans.append(SlidePlan(i,section,'content','99+项','99+项',[],[{'original_text':'99+项'}]))
+    issues=content_issues(p,plans,PresentationRequest(required_sections=['数据','风险']))
+    assert any(i.code=='SECTION_ORDER' for i in issues)
+    assert not any(i.code=='TEMPLATE_SAMPLE' for i in issues)

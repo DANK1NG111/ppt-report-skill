@@ -38,7 +38,7 @@ def native_plans(blocks,request,facts,outline,max_rows=6):
             for rows in table_pages(block.rows,max_rows=max_rows):
                 pages.append(SlidePlan(0,section,'content',section+'数据',section, [f.id for f in matching],refs,visual_type='table',layout_requirement='table',importance=3,payload={'rows':rows}))
         if block.kind=='image' and block.image_path:
-            pages.append(SlidePlan(0,section,'content',section+'图示',section,[],[dict(fact_id='image-'+hashlib.sha256(block.image_path.encode()).hexdigest()[:12],source=block.source,location=block.location,original_text='用户材料图片')],visual_type='image',layout_requirement='image_text',payload={'image':block.image_path}))
+            pages.append(SlidePlan(0,section,'content',section+'图示',section,[],[dict(fact_id='image-'+hashlib.sha256(block.image_path.encode()).hexdigest()[:12],source=block.source,location=block.location,original_text='用户材料图片')],visual_type='image',layout_requirement='image_full',payload={'image':block.image_path}))
     for i,visual in enumerate(request.visuals):
         section=visual.get('section',outline.sections[0])
         if section not in outline.sections:raise ReportError('INVALID_REQUEST',f'visuals[{i}].section 不在目录内。')
@@ -47,7 +47,7 @@ def native_plans(blocks,request,facts,outline,max_rows=6):
         refs=[dict(fact_id=f'request-visual-{i}',source='<user request>',location=f'visuals[{i}]',original_text=original)]
         data=visual.get('data',{})
         payload={'image':visual.get('path'),'fit':visual.get('fit','contain')} if kind=='image' else {'rows':data.get('rows',[])} if kind=='table' else {kind:deepcopy(data)}
-        pages.append(SlidePlan(0,section,'content',title,title,[],refs,visual_type=kind,layout_requirement='image_text' if kind=='image' else 'process' if kind=='diagram' else kind,importance=3,payload=payload))
+        pages.append(SlidePlan(0,section,'content',title,title,[],refs,visual_type=kind,layout_requirement='image_full' if kind=='image' else 'process' if kind=='diagram' else kind,importance=3,payload=payload))
     return pages,excluded
 
 
@@ -67,7 +67,12 @@ def combine_plans(request,facts,outline,profile,blocks,max_chars,max_rows):
         if not additions:continue
         placeholders=[p for p in plans if p.section==section and p.slide_type=='content' and all(t.startswith('[待补充') for t in p.payload.get('text_items',[]))]
         for p in placeholders:plans.remove(p)
-        index=max([i for i,p in enumerate(plans) if p.section==section]+[next((i for i,p in enumerate(plans) if p.slide_type=='closing'),len(plans))-1])+1
+        positions=[i for i,p in enumerate(plans) if p.section==section and p.slide_type in {'content','section'}]
+        if positions:
+            index=max(positions)+1
+        else:
+            later=set(outline.sections[outline.sections.index(section)+1:])
+            index=next((i for i,p in enumerate(plans) if (p.section in later and p.slide_type in {'content','section'}) or p.slide_type=='closing'),len(plans))
         plans[index:index]=additions
     if request.target_slide_count and len(plans)!=request.target_slide_count:
         if len(plans)>request.target_slide_count:raise ReportError('CONSTRAINT_CONFLICT',f'原生对象与必选章节至少需要 {len(plans)} 页，目标为 {request.target_slide_count} 页。')

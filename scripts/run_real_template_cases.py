@@ -31,4 +31,7 @@ def run_cases(output='output/real_template_cases'):
     return results
 
 
-if __name__=='__main__':run_cases()
+if __name__=='__main__':
+    import argparse
+    parser=argparse.ArgumentParser();parser.add_argument('--output',default='output/real_template_cases')
+    run_cases(parser.parse_args().output)

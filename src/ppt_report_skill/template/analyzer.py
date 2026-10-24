@@ -70,7 +70,7 @@ def analyze_template(path, output=None):
             is_picture = shape.shape_type == MSO_SHAPE_TYPE.PICTURE
             # Border images and large backgrounds are conservatively protected.
             border = shape.top+shape.height < height*.15 or shape.top > height*.91
-            large = shape.width*shape.height > width*height*.65
+            large = shape.width*shape.height > width*height*.65 or (shape.width >= width*.95 and shape.height >= height*.25)
             is_logo = is_picture and border and shape.width < width*.5
             repeated = is_picture and image_counts[shape.image.sha1] >= 3 and border
             is_fixed_text = shape.has_text_frame and bool(re.search(r'出品|版权所有|copyright',shape.text,re.I))

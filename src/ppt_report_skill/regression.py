@@ -24,9 +24,9 @@ def run_regression(root=None):
         for group,words in groups.items():categories[group]=sum(any(word in c.get('classname','') for word in words) for c in cases)
     real=None
     if process.returncode==0:
-        real_process=subprocess.run([sys.executable,'scripts/run_real_template_cases.py'],cwd=root,capture_output=True,text=True,timeout=600)
+        real_process=subprocess.run([sys.executable,'scripts/run_real_template_cases.py','--output',str(output/'real_template_cases')],cwd=root,capture_output=True,text=True,timeout=600)
         (output/'real_template.log').write_text(real_process.stdout+real_process.stderr)
-        if real_process.returncode==0:real=json.loads((root/'output/real_template_cases/real_template_report.json').read_text())
+        if real_process.returncode==0:real=json.loads((output/'real_template_cases/real_template_report.json').read_text())
     passed=process.returncode==0 and all(categories.values()) and real is not None and real['status']=='PASS'
     report={'status':'PASS' if passed else 'FAIL','pytest_returncode':process.returncode,'counts':counts,'categories':categories,'real_template':real,'elapsed_seconds':round(time.monotonic()-start,2)}
     save_json(report,output/'regression_report.json')
