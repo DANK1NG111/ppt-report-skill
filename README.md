@@ -1,24 +1,70 @@
 # PPT 汇报制作 Skill
 
-基于用户真实 PPTX 模板和材料生成主要对象可编辑、事实可追溯的汇报演示文稿。开发中，验收状态见 `development_log.md`。
+使用真实 PPTX 模板和汇报材料制作可编辑的工作汇报、项目进展、学术或答辩演示文稿。模板原文件不变；来源事实、数字、日期和状态保留在生成记录及备注中。标题、正文、表格、普通图表、流程节点与连接线均为 PowerPoint 原生对象，图片可单独替换。
 
-Python 3.11 以上。创建虚拟环境后运行 `python -m pip install -e '.[dev]'`。基础验证为 `python -m pytest`，CLI 帮助为 `python scripts/create_presentation.py --help`。
+## 安装与运行
 
-用户原模板始终保留，工作副本位于 `assets/templates/base_template.pptx`。测试内容必须标注 TEST FIXTURE。模板使用须遵守原作者条款。
-
-当前 Phase 0–13 已通过，Phase 14 正在验收。`create` 生成草稿，尚未接入后续结构 QA、视觉 QA 和自动修复；不能据此声称 V1 已完成。
+需要 Python 3.11+、LibreOffice/soffice。PowerPoint 用于最终原生打开验证。先切换到项目根目录，再运行：
 
 ```bash
-python scripts/analyze_template.py --template assets/templates/base_template.pptx
-python scripts/create_presentation.py --materials report.md --request request.json --output output/draft.pptx
+python3 -m venv .venv
+.venv/bin/python -m pip install -e '.[dev]'
+.venv/bin/python scripts/analyze_template.py --template assets/templates/base_template.pptx
+.venv/bin/python scripts/create_presentation.py --template assets/templates/base_template.pptx --materials tests/fixtures/work_report/material.md --request tests/fixtures/work_report/request.json
 ```
 
-`request.json` 示例：
+当前工作区已有可用 `.venv`。macOS 系统 Python 若被 Xcode 许可阻止，可使用应用附带的 Python 建立环境。渲染器依次检测 `PPT_REPORT_SOFFICE`、PATH 中的 soffice/libreoffice 和 macOS 应用路径。另一台机器需自行提供 Office 渲染引擎及所需字体。
+
+默认生成 `output/final_presentation.pptx`，状态为 `READY_FOR_VISUAL_REVIEW`。输出目录旁的 `pipeline_receipt.json` 指向独立 `build/<run-id>/`，其中保留模板档案、来源事实、冲突、Outline、逐页方案、生成尝试、修复记录和全页渲染。指定 `--output /path/report.pptx` 可另存。`--draft` 只生成未验收草稿。
+
+支持 txt、md、docx、可提取文字的 pdf、pptx、xlsx，以及 `--text` 直接文本。多份材料在 `--materials` 后依次列出；表格转为原生表格，材料内可提取的图片保留为独立对象。不会自动联网搜图。
+
+## 请求格式
 
 ```json
-{"topic":"季度工作汇报","presentation_type":"work_report","duration":5,"target_slide_count":8,"template_mode":"STRICT_TEMPLATE"}
+{
+  "topic": "季度工作汇报",
+  "presentation_type": "work_report",
+  "audience": "项目组",
+  "duration": 5,
+  "target_slide_count": 8,
+  "required_sections": ["目标", "已完成工作", "成果", "问题", "下一步"],
+  "focus_points": ["完成率"],
+  "must_include": ["87.6%"],
+  "template_mode": "STRICT_TEMPLATE",
+  "speaker_notes": true
+}
 ```
 
-模板档案与预览分别位于 `assets/template_profiles/` 和 `assets/previews/`。生成草稿旁的 `build/` 包含来源事实、目录、逐页计划和对象写入记录。冲突时保存 conflicts.json 并拒绝生成。
+目标页数包含封面和结尾。固定目录逐字保留、顺序不变。未给类型、听众、时长、页数时采用保守推断并记录。页数过少不能容纳全部证据时返回 `CONSTRAINT_CONFLICT`。材料不足使用明确待补充项，数字冲突阻止生成。更多图表、图片、表格、流程图输入见 [请求与原生对象格式](references/request_format.md)。
 
-macOS 若系统 Python 提示 Xcode 许可问题，可使用 Codex 应用附带 Python 建立 `.venv`，随后统一使用 `.venv/bin/python`。渲染依赖 LibreOffice/soffice，支持 `PPT_REPORT_SOFFICE` 指定路径；渲染时的字体替代会记录在 render_receipt.json，PPTX 原字体声明保留。
+`STRICT_TEMPLATE` 默认复用已有布局及其正文区域，保留主题、背景、Logo、字体、页眉页脚。独立图片可放入已有完整正文区域，防止误用背景或留下空装饰槽位。`FLEXIBLE_TEMPLATE` 允许从已有正文页派生缺少的布局。
+
+## 检查与交付
+
+```bash
+.venv/bin/python scripts/validate_presentation.py --input output/final_presentation.pptx --build output/build/RUN_ID
+.venv/bin/python scripts/render_presentation.py --input output/final_presentation.pptx --output output/rendered
+.venv/bin/ppt-report finalize --receipt output/pipeline_receipt.json --review review.json --pdf
+```
+
+复核者实际查看全部渲染页面、核对事实与目录，并用 PowerPoint 打开当前文件确认无修复提示，再按 [复核字段示例](references/review.example.json) 填写 `review.json`。这一步由执行 Skill 的 Codex 或实际复核者完成，不需每阶段向用户确认。交付门禁检查 PPTX 和全部渲染产物哈希、页数、逐页记录及每个 Warning 的处置。成功后输出 `generation_report.md`、`delivery_receipt.json`、`visual_review.json` 与可选 `final_presentation.pdf`。改动文件后必须重新渲染和复核。
+
+生成报告包含页数、模板、汇报类型、材料来源、待补充项、字体替代、兼容性与 QA 结果。控制台错误简明，技术堆栈保留在 `error.log`。字体缺失通常为 Warning；PPTX 字体声明保留，本机渲染替代写入回执。
+
+## 验证与示例
+
+```bash
+.venv/bin/python scripts/run_regression.py
+.venv/bin/python scripts/run_real_template_cases.py
+.venv/bin/python scripts/run_native_case.py
+.venv/bin/python scripts/audit_acceptance.py
+```
+
+三套固定材料位于 `tests/fixtures/{work_report,project_report,defense}`，均标为 TEST FIXTURE，不代表真实业务或用户个人经历。已验收的输出位于 `output/real_template_cases/`，原生对象综合案例位于 `output/native_case/`。回归独立使用 `output/regression/real_template_cases/`，不会覆盖已复核产物。最终状态与证据见 [FINAL_REPORT](FINAL_REPORT.md) 和 [开发日志](development_log.md)。
+
+## 使用边界
+
+文本提取、事实分类、冲突识别和模板分类采用规则及几何启发式。对语义改写的冲突、特殊母版或复杂组合对象，执行 Skill 的 Codex 仍需核对并修正计划；不得把规则通过当作事实已确认。扫描 PDF 不含 OCR；Excel 公式按原公式读取、不计算；非标准照片 EXIF 方向需先保存到像素。常用原生图表支持 column/bar/line/pie；复杂动画、三维图表和视频不在 V1 范围。
+
+原始用户模板与其副本不纳入 Git 分发。模板作者的署名和授权条件沿用原模板第21页说明；使用该示例模板仍应遵守其原有使用范围。项目代码不会修改原始模板。

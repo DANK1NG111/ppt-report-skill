@@ -594,3 +594,25 @@ Validation:
 
 Next:
 Phase 27
+
+## Phase 27
+
+Status: PASS
+
+Implemented:
+- Skill使用与开发文档完善
+
+Tests:
+- Skill quick_validate通过；文档链接检查通过，CLI help验证通过；唯一待生成链接为Phase30 FINAL_REPORT。
+
+Problems Found:
+- 无新增阻塞。
+
+Fixes:
+- 无。
+
+Validation:
+- 完整覆盖输入输出、两种模式、事实与目录、布局、可编辑对象、QA修复、异常和交付；原生对象JSON示例可复用。
+
+Next:
+Phase 28
