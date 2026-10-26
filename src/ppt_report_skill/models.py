@@ -1,4 +1,5 @@
 """Versioned JSON-serializable contracts shared by all pipeline stages."""
+
 from dataclasses import asdict, dataclass, field
 from pathlib import Path
 import json
@@ -7,8 +8,14 @@ import json
 def save_json(value, path):
     path = Path(path)
     path.parent.mkdir(parents=True, exist_ok=True)
-    path.write_text(json.dumps(asdict(value) if hasattr(value, "__dataclass_fields__") else value,
-                               ensure_ascii=False, indent=2), encoding="utf-8")
+    path.write_text(
+        json.dumps(
+            asdict(value) if hasattr(value, "__dataclass_fields__") else value,
+            ensure_ascii=False,
+            indent=2,
+        ),
+        encoding="utf-8",
+    )
 
 
 @dataclass
@@ -146,6 +153,7 @@ class Issue:
 
 class ReportError(Exception):
     """Stable machine code plus concise user-facing explanation."""
+
     def __init__(self, code, message, detail=""):
         self.code, self.message, self.detail = code, message, detail
         super().__init__(f"{code}: {message}")

@@ -616,3 +616,25 @@ Validation:
 
 Next:
 Phase 28
+
+## Phase 28
+
+Status: PASS
+
+Implemented:
+- 代码整理与CLI默认路径统一
+
+Tests:
+- Ruff F检查与compileall通过；142项全量回归通过，0失败/错误/跳过；实际CLI验证默认文件名及显式输出覆盖。
+
+Problems Found:
+- 未使用导入、密集单行代码，旧CLI默认验证路径与默认生成路径不一致。
+
+Fixes:
+- 清理15处未用导入，统一格式，展开CLI错误分级和分支，统一final_presentation默认路径，删除本次闲置预览素材。
+
+Validation:
+- 回归产物隔离，保留已经逐页复核与原生打开的4套交付文件及其哈希回执。
+
+Next:
+Phase 29

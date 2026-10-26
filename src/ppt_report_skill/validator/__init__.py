@@ -1,1 +1,1 @@
-from .presentation import validate_presentation
+from .presentation import validate_presentation as validate_presentation

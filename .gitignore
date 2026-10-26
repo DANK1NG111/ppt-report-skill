@@ -10,3 +10,5 @@ assets/templates/*.pptx
 *.textClipping
 /*.pptx
 .DS_Store
+
+.ruff_cache/
