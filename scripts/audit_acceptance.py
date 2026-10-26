@@ -24,6 +24,10 @@ def audit(receipt):
     text = compact("\n".join(slide_text(s) for s in prs.slides))
     layouts = {l["layout_id"]: l for l in profile["layouts"]}
     assert all(compact(f["content"]) in text for f in facts), "source fact missing"
+    rendered_text = compact("\n".join(r["rendered"]["page_texts"]))
+    assert all(compact(f["content"]) in rendered_text for f in facts), (
+        "rendered source fact missing"
+    )
     order = []
     for p in plans:
         if p["slide_type"] in {"content", "section"} and (
@@ -102,6 +106,7 @@ if __name__ == "__main__":
     inputs = [
         *Path("output/real_template_cases").glob("*/pipeline_receipt.json"),
         Path("output/native_case/pipeline_receipt.json"),
+        Path("output/second_template/pipeline_receipt.json"),
     ]
     reports = [audit(p) for p in inputs]
     assert all(r["errors"] == 0 for r in reports)
