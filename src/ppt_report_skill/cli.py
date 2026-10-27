@@ -38,13 +38,17 @@ def main(argv: list[str] | None = None) -> int:
             "render",
             "regression",
             "finalize",
+            "doctor",
+            "rehearse",
             "smoke",
         ],
     )
     parser.add_argument(
         "--output", help="输出文件或目录；create 默认 output/final_presentation.pptx"
     )
-    parser.add_argument("--template", default="assets/templates/base_template.pptx")
+    parser.add_argument(
+        "--template", help="PPTX模板；省略时优先用户模板，否则使用自带简洁模板"
+    )
     parser.add_argument("--materials", nargs="*", default=[])
     parser.add_argument("--request", help="PresentationRequest JSON 文件")
     parser.add_argument("--text", help="直接提供的汇报材料")
@@ -56,6 +60,7 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--build", help="包含逐页方案、请求与模板档案的目录")
     parser.add_argument("--receipt", help="Pipeline 回执 JSON")
     parser.add_argument("--review", help="逐页复核记录 JSON")
+    parser.add_argument("--smoke", action="store_true", help="doctor实际生成并渲染自检")
     parser.add_argument("--pdf", action="store_true", help="交付时复制 PDF")
     parser.add_argument(
         "--draft", action="store_true", help="仅生成草稿，跳过完整 QA 流程"
@@ -80,6 +85,23 @@ def main(argv: list[str] | None = None) -> int:
 
 
 def execute(args: argparse.Namespace) -> int:
+    if args.command == "doctor":
+        from .doctor import doctor
+
+        result = doctor(args.output or "output/doctor", smoke=args.smoke)
+        print(f"{result['status']}: {result['checks']}")
+        return int(result["status"] == "BLOCKED")
+    if args.command == "rehearse":
+        from .rehearsal import export_rehearsal
+
+        if not args.receipt:
+            raise ReportError("INVALID_REQUEST", "rehearse需要--receipt。")
+        print(export_rehearsal(args.receipt, args.output))
+        return 0
+    if args.command in {"create", "analyze"} and not args.template:
+        from .starter import default_template
+
+        args.template = str(default_template())
     if args.command == "finalize":
         from .delivery import finalize_delivery
 

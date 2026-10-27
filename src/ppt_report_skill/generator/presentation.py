@@ -9,6 +9,7 @@ from ppt_report_skill.layout.matcher import match_layout
 from ppt_report_skill.template.analyzer import walk_shapes
 from .text import write_text
 from .images import add_image
+from ppt_report_skill.layout.regions import body_regions, union_box
 from .tables import add_table
 from .charts import add_chart
 from .shapes import add_diagram
@@ -131,17 +132,7 @@ def populate(slide, plan, layout, profile, request):
         return receipts
     items = plan.payload.get("text_items", [])
     # Existing long body areas are preferred to small keyword labels.
-    areas = sorted(
-        [
-            b
-            for b in bodies
-            if b["height"] > profile.slide_height * 0.10
-            and b["width"] > profile.slide_width * 0.15
-        ],
-        key=lambda b: (b["y"], b["x"]),
-    )
-    if not areas:
-        areas = sorted(bodies, key=lambda b: b["width"] * b["height"], reverse=True)
+    areas = body_regions(bodies, profile)
     for b in bodies:
         shapes[b["shape_id"]].text_frame.clear()
     for b in layout.image_boxes:
@@ -189,14 +180,7 @@ def populate(slide, plan, layout, profile, request):
         if not areas:
             raise ReportError("LAYOUT_NOT_FOUND", "模板没有可放置内容的区域。")
         # Use the union of existing body areas; fixed objects remain untouched.
-        x = min(b["x"] for b in areas)
-        y = min(b["y"] for b in areas)
-        box = {
-            "x": x,
-            "y": y,
-            "width": max(b["x"] + b["width"] for b in areas) - x,
-            "height": max(b["y"] + b["height"] for b in areas) - y,
-        }
+        box = union_box(areas)
         # A chart/table owns the body region, so unused native text objects are removed.
         for b in bodies:
             if b["shape_id"] in shapes:

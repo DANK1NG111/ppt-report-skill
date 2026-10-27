@@ -14,11 +14,27 @@ from .contact_sheet import contact_sheet
 
 
 def find_office():
+    config = Path(__file__).resolve().parents[3] / ".runtime/config.json"
+    try:
+        configured = (
+            json.loads(config.read_text()).get("soffice") if config.exists() else None
+        )
+    except (OSError, ValueError):
+        configured = None
     candidates = [
+        configured,
         os.environ.get("PPT_REPORT_SOFFICE"),
         shutil.which("soffice"),
         shutil.which("libreoffice"),
         "/Applications/LibreOffice.app/Contents/MacOS/soffice",
+        str(
+            Path(os.environ.get("PROGRAMFILES", "C:/Program Files"))
+            / "LibreOffice/program/soffice.exe"
+        ),
+        str(
+            Path(os.environ.get("PROGRAMFILES(X86)", "C:/Program Files (x86)"))
+            / "LibreOffice/program/soffice.exe"
+        ),
     ]
     return next(
         (str(Path(p).resolve()) for p in candidates if p and Path(p).is_file()), None

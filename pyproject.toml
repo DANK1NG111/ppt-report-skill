@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "ppt-report-skill"
-version = "1.0.0"
+version = "1.1.0"
 description = "Template-preserving, source-traceable editable report presentations"
 requires-python = ">=3.11"
 dependencies = ["python-pptx>=1.0", "lxml>=5", "Pillow>=10", "PyMuPDF>=1.24,<1.27", "python-docx>=1.1", "openpyxl>=3.1", "fonttools>=4.50"]
@@ -21,4 +21,4 @@ where = ["src"]
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 pythonpath = ["src"]
-markers = ["render: requires actual LibreOffice/soffice rendering"]
+markers = ["render: requires actual LibreOffice/soffice rendering", "private_template: requires the locally supplied non-distributed template"]

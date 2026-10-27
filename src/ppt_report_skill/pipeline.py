@@ -22,6 +22,8 @@ from ppt_report_skill.repair import repair_loop
 from ppt_report_skill.layout.flexible import extend_layouts
 from ppt_report_skill.fonts import font_report
 from ppt_report_skill.validator.presentation import write_report
+from ppt_report_skill.design import make_design_contract, verify_design_contract
+from ppt_report_skill.layout.matcher import match_layout
 
 
 def native_plans(blocks, request, facts, outline, max_rows=6):
@@ -275,6 +277,10 @@ def create_presentation(template, materials, request_data, output, direct_text=N
     for attempt, (chars, rows) in enumerate([(280, 6), (160, 3), (90, 2)], 1):
         try:
             plans = combine_plans(request, facts, outline, profile, blocks, chars, rows)
+            for plan in plans:
+                match_layout(plan, profile, request.template_mode)
+            contract = make_design_contract(profile, plans, request, outline, build)
+            verify_design_contract(contract, profile, plans)
             path = generate_presentation(
                 template,
                 profile,
@@ -302,6 +308,7 @@ def create_presentation(template, materials, request_data, output, direct_text=N
             ):
                 save_json(attempts, build / "generation_attempts.json")
                 raise
+    verify_design_contract(contract, profile, plans)
     save_json(outline, build / "outline.json")
     save_json(attempts, build / "generation_attempts.json")
     repaired = repair_loop(path, build / "repair", plans, request, profile)
@@ -342,6 +349,8 @@ def create_presentation(template, materials, request_data, output, direct_text=N
         "template": str(Path(template).resolve()),
         "sources": sorted({f.source for f in facts}),
         "fonts": fonts,
+        "design_spec": str(build / "design_spec.json"),
+        "design_lock_sha256": contract["lock_sha256"],
     }
     save_json(result, build / "pipeline_receipt.json")
     save_json(result, output.parent / "pipeline_receipt.json")
