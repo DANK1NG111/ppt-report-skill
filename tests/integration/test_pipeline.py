@@ -54,3 +54,6 @@ def test_native_objects_stay_in_their_sections():
         for section in request.required_sections
     }
     assert max(positions["数据"]) < min(positions["风险"]) < min(positions["下一步"])
+
+
+pytestmark = pytest.mark.private_template

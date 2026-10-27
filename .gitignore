@@ -12,3 +12,6 @@ assets/templates/*.pptx
 .DS_Store
 
 .ruff_cache/
+.runtime/
+.dist/
+.setup-check/

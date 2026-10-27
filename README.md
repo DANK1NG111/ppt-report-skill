@@ -2,18 +2,30 @@
 
 使用真实 PPTX 模板和汇报材料制作可编辑的工作汇报、项目进展、学术或答辩演示文稿。模板原文件不变；来源事实、数字、日期和状态保留在生成记录及备注中。标题、正文、表格、普通图表、流程节点与连接线均为 PowerPoint 原生对象，图片可单独替换。
 
-## 安装与运行
+## 把仓库链接发给 Agent 即可安装
 
-需要 Python 3.11+、LibreOffice/soffice。PowerPoint 用于最终原生打开验证。先切换到项目根目录，再运行：
+将本仓库的 GitHub 地址发给有本地文件和命令权限的 Agent，并说明“安装并配置这个 Skill”。Agent 按 [BOOTSTRAP.md](BOOTSTRAP.md) 克隆到稳定目录、创建独立环境、补齐依赖和渲染引擎、生成中文自检PPT，再注册技能。用户无需逐项手动安装 Python 包。当前尚未发布远程仓库；该流程可在发布前通过源码包在隔离目录验证。
 
-```bash
-python3 -m venv .venv
-.venv/bin/python -m pip install -e '.[dev]'
-.venv/bin/python scripts/analyze_template.py --template assets/templates/base_template.pptx
-.venv/bin/python scripts/create_presentation.py --template assets/templates/base_template.pptx --materials tests/fixtures/work_report/material.md --request tests/fixtures/work_report/request.json
+已有仓库时，一条命令配置：
+
+```sh
+# macOS / Linux；Claude Code把codex改为claude
+sh setup.sh --install-system --agent codex
+# Windows PowerShell
+powershell -File setup.ps1 --install-system --agent codex
 ```
 
-当前工作区已有可用 `.venv`。macOS 系统 Python 若被 Xcode 许可阻止，可使用应用附带的 Python 建立环境。渲染器依次检测 `PPT_REPORT_SOFFICE`、PATH 中的 soffice/libreoffice 和 macOS 应用路径。另一台机器需自行提供 Office 渲染引擎及所需字体。
+安装完成必须看到 `.runtime/setup_receipt.json` 为 READY。它表示真实制作与全页渲染通过，不只是依赖文件存在。macOS自动补Office使用已安装的Homebrew，Linux使用apt/dnf，Windows使用winget；权限或网络不满足时会保留具体错误和可重试日志。安装器不覆盖无关的现有Skill。
+
+新安装自带本项目制作的简洁模板；有用户模板时通过 `--template` 指定。仓库不包含本机的西南交通大学私有模板，公开环境也能直接开始制作。
+
+```sh
+.venv/bin/ppt-report doctor --smoke
+.venv/bin/ppt-report create --materials report.md --request request.json --output output/report.pptx
+.venv/bin/ppt-report rehearse --receipt output/pipeline_receipt.json
+```
+
+Windows使用 `.venv/Scripts/`。已有 Python 3.11+ 的开发者也可运行 `python -m venv .venv` 后执行 `.venv/bin/python -m pip install -e '.[dev]'`。开发回归涉及本机私有模板时使用完整测试；公开安装验证使用自带模板和公开测试集。
 
 默认生成 `output/final_presentation.pptx`，状态为 `READY_FOR_VISUAL_REVIEW`。输出目录旁的 `pipeline_receipt.json` 指向独立 `build/<run-id>/`，其中保留模板档案、来源事实、冲突、Outline、逐页方案、生成尝试、修复记录和全页渲染。指定 `--output /path/report.pptx` 可另存。`--draft` 只生成未验收草稿。
 
@@ -66,5 +78,7 @@ python3 -m venv .venv
 ## 使用边界
 
 文本提取、事实分类、冲突识别和模板分类采用规则及几何启发式。对语义改写的冲突、特殊母版或复杂组合对象，执行 Skill 的 Codex 仍需核对并修正计划；不得把规则通过当作事实已确认。扫描 PDF 不含 OCR；Excel 公式按原公式读取、不计算；非标准照片 EXIF 方向需先保存到像素。常用原生图表支持 column/bar/line/pie；复杂动画、三维图表和视频不在 V1 范围。
+
+V1.1 的实现、验证证据和平台边界见 [整合验收报告](V1_1_REPORT.md)，两个上游项目的优点与取舍见 [整合分析](references/upstream_analysis.md)。每次完整生成保留 design_spec.json/.md，锁定模板、版式、事实和逐页角色；rehearse导出独立HTML，包含当前/下一页、稳定ID备注和计划/实际计时，可断网使用。
 
 原始用户模板与其副本不纳入 Git 分发。模板作者的署名和授权条件沿用原模板第21页说明；使用该示例模板仍应遵守其原有使用范围。项目代码不会修改原始模板。

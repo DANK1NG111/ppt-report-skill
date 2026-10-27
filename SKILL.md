@@ -3,9 +3,19 @@ name: ppt-report-skill
 description: 基于用户提供的真实 PPTX 模板与汇报材料，制作可编辑的工作汇报、项目进展、学术或答辩演示文稿，并渲染和检查全部页面。
 ---
 
+## 入口路由
+
+| 用户任务 | 执行入口 |
+|---|---|
+| 从仓库地址安装配置 | 读 [BOOTSTRAP](BOOTSTRAP.md)，执行安装和实际doctor自检，READY后继续使用 |
+| 用用户模板制作汇报 | 原文件副本 + STRICT_TEMPLATE，完整Pipeline |
+| 没有模板制作汇报 | 使用自制简洁模板，保留来源与全部QA门槛 |
+| 只分析或检查已有文件 | analyze/validate/render，不覆盖原文件 |
+| 排练和备注 | 对当前生成回执运行 rehearse，输出离线辅助HTML |
+
 使用真实模板副本，保护用户原文件。默认 STRICT_TEMPLATE。保留主题、背景、固定 Logo 与主要字体体系。事实与数值必须来自材料，缺失项明确标注，冲突不得自动任选。
 
-输入至少包含真实 PPTX 模板和汇报材料。支持 txt、md、docx、可提取文字的 pdf、pptx、xlsx 与直接文本。请求使用英文 JSON 字段，结构见 `src/ppt_report_skill/models.py` 的 PresentationRequest。按需读取 [汇报规则](references/report_rules.md)、[事实规则](references/content_rules.md)、[类型规则](references/presentation_types.md)。
+必要输入是汇报材料；有用户模板时优先使用，没有时使用本项目简洁模板，不把它冒充用户品牌模板。支持 txt、md、docx、可提取文字的 pdf、pptx、xlsx 与直接文本。请求使用英文 JSON 字段，结构见 `src/ppt_report_skill/models.py` 的 PresentationRequest。按需读取 [汇报规则](references/report_rules.md)、[事实规则](references/content_rules.md)、[类型规则](references/presentation_types.md)。
 
 先读取模板档案和全页预览。保留用户原文件，仅使用副本。主题、背景、Logo、边缘元素和署名沿用模板。STRICT_TEMPLATE 缺少所需布局时明确报错；FLEXIBLE_TEMPLATE 可从现有正文页派生缺少的封面、章节、目录等布局，保留主题和固定对象。
 
@@ -13,7 +23,7 @@ description: 基于用户提供的真实 PPTX 模板与汇报材料，制作可�
 
 根据 Outline 和 SlidePlan 为每页匹配现有模板页面，克隆原生对象并写入文本。表格、普通图表、流程图均使用原生对象。图表保留单位、时间和嵌入数据工作簿。图片独立放置，保持比例，不自动联网搜图。详见 [布局规则](references/layout_rules.md) 与 [可编辑规则](references/editable_rules.md)。
 
-在 Skill 根目录创建环境并安装依赖后运行：
+先按BOOTSTRAP完成独立环境。使用Skill目录 `.venv` 中的Python运行；下面的模板路径替换成用户提供的实际路径，省略--template时使用自带简洁模板：
 
 ```bash
 python scripts/analyze_template.py --template assets/templates/base_template.pptx
@@ -33,3 +43,9 @@ python scripts/create_presentation.py --template assets/templates/base_template.
 默认输出 `output/final_presentation.pptx`。完成逐页复核和 PowerPoint 原生打开后，按 [复核字段](references/review.example.json) 写入真实观察，执行 `ppt-report finalize --receipt output/pipeline_receipt.json --review review.json --pdf`。只有 DELIVERED 状态才可作为验收交付；同时交付 generation_report.md，其中说明页数、模板、类型、材料来源、待补充、字体、兼容性和 QA。需要可选 PDF 时加 --pdf。自动生成状态 READY_FOR_VISUAL_REVIEW 和 DRAFT_UNVALIDATED 都不能冒充最终验收通过。
 
 准备交付前运行 `python scripts/run_regression.py` 验证相关规则、材料、规划、原生对象与真实渲染。项目的全量开发回归会重新生成三套 TEST FIXTURE，但写入独立回归目录，不覆盖已复核交付。具体边界见 [README](README.md) 的使用边界；尤其扫描 PDF、公式计算与复杂语义冲突不能假称已经自动处理。
+
+## 设计锁定与排练
+
+完整生成在写入PPTX前保存 design_spec.json/.md，包含模板SHA、字体、配色、允许版式、逐页真实模板页、稳定ID、用途、图片槽位、视觉节奏与讲述时长。锁定后事实、数据、标题、章节或版式变化须重新规划，不能只改下游文件绕过 DESIGN_DRIFT。普通修复仍按既有QA规则进行。
+
+需要演讲准备时执行 `.venv/bin/ppt-report rehearse --receipt /absolute/output/pipeline_receipt.json`，输出离线单文件 rehearsal.html。当前页和下一页采用实际渲染图，备注按稳定页面ID本机保存，重排不会按页号串页。计时支持暂停和重置；自动翻页默认关闭；窗口进入后台暂停计时。排练HTML辅助展示，主要内容继续在PPTX编辑；原生PPTX交付标准保持。设计规范与排练吸收的上游优点和取舍见 [整合分析](references/upstream_analysis.md)。

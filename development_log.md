@@ -682,3 +682,27 @@ Validation:
 
 Next:
 V1 delivery
+
+## V1.1 上游整合与URL安装
+
+Status: PASS
+
+Implemented:
+- 分析ppt-master与guizang-ppt-skill固定版本，自行实现任务路由、设计锁定、稳定页面ID、图片槽位规划和离线排练。
+- 新增独立环境安装器、系统依赖检测与安装入口、真实doctor自检、Agent技能注册、自制公开模板与白名单发布包。
+
+Tests:
+- 完整pytest 154项通过；公开包隔离安装READY，实际5页中文制作渲染通过；独立前向测试验证来源事实、14个原生文字对象和全部5页排练图片。
+- CUA实际检查翻页、逐页备注、计时与窄窗口；Windows与远程CI未实机执行。
+
+Problems Found:
+- 入口脚本原先忽略显式--python，已有可用解释器时仍尝试下载uv。
+
+Fixes:
+- shell与PowerShell入口优先使用显式解释器；隔离PATH复验READY，新增对应自动回归。
+
+Validation:
+- V1_1_REPORT.md记录本次范围与证据；不把环境READY当作演示文稿DELIVERED，没有发布远程仓库。
+
+Next:
+按用户后续要求发布GitHub；当前不执行远程发布。

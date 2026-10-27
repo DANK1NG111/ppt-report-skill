@@ -28,3 +28,6 @@ def test_conflict_stops_generation(tmp_path):
         )
     assert not (tmp_path / "draft.pptx").exists()
     assert json.loads((tmp_path / "build/conflicts.json").read_text())
+
+
+pytestmark = pytest.mark.private_template

@@ -1,3 +1,4 @@
+import pytest
 import hashlib
 from zipfile import ZipFile
 from lxml import etree
@@ -50,3 +51,6 @@ def test_real_template_generation(tmp_path):
             for paragraph in root.xpath('//*[local-name()="p"]'):
                 assert len(paragraph.xpath('./*[local-name()="pPr"]')) <= 1
     assert hashlib.sha256(open(source, "rb").read()).hexdigest() == profile.sha256
+
+
+pytestmark = pytest.mark.private_template

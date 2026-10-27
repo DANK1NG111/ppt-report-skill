@@ -1,3 +1,4 @@
+import pytest
 from zipfile import ZipFile
 from pptx import Presentation
 from pptx.util import Inches, Pt
@@ -42,6 +43,7 @@ def test_valid_native_file(tmp_path):
     assert validate_presentation(out)["errors"] == 0
 
 
+@pytest.mark.private_template
 def test_inherited_crop_is_reviewed_not_silently_ignored(tmp_path):
     from ppt_report_skill.models import SlidePlan
     from ppt_report_skill.template.analyzer import analyze_template

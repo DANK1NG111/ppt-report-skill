@@ -55,3 +55,6 @@ def test_delivery_requires_current_render_and_complete_review(tmp_path):
     Path(result["path"]).write_bytes(b"changed")
     with pytest.raises(ReportError, match="PPTX"):
         finalize_delivery(result, review)
+
+
+pytestmark = pytest.mark.private_template
