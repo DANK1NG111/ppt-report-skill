@@ -2,6 +2,8 @@
 
 日期：2026-10-27。版本：1.1.0。
 
+本报告保留发布前的验收状态；后续公开发布与下载版本见 [GitHub 仓库](https://github.com/DANK1NG111/ppt-report-skill) 和 [Releases](https://github.com/DANK1NG111/ppt-report-skill/releases)。
+
 本次完成两个上游项目的源码分析、适合本项目的功能实现，以及公开源码包的隔离安装验证。没有创建或发布远程仓库。V1 原有验收记录保留在 FINAL_REPORT.md，本报告只记录本次新增范围。
 
 ## 分析与实现

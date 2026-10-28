@@ -706,3 +706,9 @@ Validation:
 
 Next:
 按用户后续要求发布GitHub；当前不执行远程发布。
+
+## GitHub 公开发布（2026-10-28）
+
+用户已授权发布至个人账号 DANK1NG111。创建公开仓库 ppt-report-skill，将经过白名单与历史文件检查的源码推送至 main；README 和 BOOTSTRAP 已写入实际仓库地址。私有模板、output、虚拟环境和本机配置不上传。
+
+远程自动检查与版本以 [Actions](https://github.com/DANK1NG111/ppt-report-skill/actions) 和 [Releases](https://github.com/DANK1NG111/ppt-report-skill/releases) 的实际状态为准；V1/V1.1 原有验收记录按当时状态保留。
