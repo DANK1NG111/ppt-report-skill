@@ -4,7 +4,11 @@
 
 ## 把仓库链接发给 Agent 即可安装
 
-将本仓库的 GitHub 地址发给有本地文件和命令权限的 Agent，并说明“安装并配置这个 Skill”。Agent 按 [BOOTSTRAP.md](BOOTSTRAP.md) 克隆到稳定目录、创建独立环境、补齐依赖和渲染引擎、生成中文自检PPT，再注册技能。用户无需逐项手动安装 Python 包。当前尚未发布远程仓库；该流程可在发布前通过源码包在隔离目录验证。
+将仓库地址 [DANK1NG111/ppt-report-skill](https://github.com/DANK1NG111/ppt-report-skill) 发给有本地文件和命令权限的 Agent，并说明“安装并配置这个 Skill”。Agent 按 [BOOTSTRAP.md](BOOTSTRAP.md) 克隆到稳定目录、创建独立环境、补齐依赖和渲染引擎、生成中文自检PPT，再注册技能。用户无需逐项手动安装 Python 包。
+
+可以直接把下面这句话发给 Agent：
+
+> 安装并配置 https://github.com/DANK1NG111/ppt-report-skill ，完成实际自检并注册 Skill，然后根据我的材料制作可编辑的汇报 PPT。
 
 已有仓库时，一条命令配置：
 
